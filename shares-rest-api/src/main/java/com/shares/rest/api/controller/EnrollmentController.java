@@ -16,7 +16,7 @@ import com.shares.rest.api.data.StudentAssignSection;
 import com.shares.rest.api.entity.EnrSection;
 import com.shares.rest.api.service.EnrollmentService;
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 @RestController
 public class EnrollmentController {
 

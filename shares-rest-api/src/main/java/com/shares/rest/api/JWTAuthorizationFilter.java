@@ -20,15 +20,16 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.MalformedJwtException;
 import io.jsonwebtoken.UnsupportedJwtException;
 
-public class JWTAuthorizationFilter extends OncePerRequestFilter {
-
-	private final String HEADER = "Authorization";
-	private final String PREFIX = "Bearer ";
-	private final String SECRET = "osraldo";
+/**
+ * 
+ * @author Osraldo M. Laput
+ *
+ */
+public class JWTAuthorizationFilter extends OncePerRequestFilter {    
 	
 	@Override
 	protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-		
+
 		try {
 			if(checkJWTToken(request, response)) {
 				Claims claims = validateToken(request);
@@ -52,8 +53,8 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 	}
 	
 	private Claims validateToken(HttpServletRequest request) {
-		String jwtToken = request.getHeader(HEADER).replace(PREFIX, "");
-		return Jwts.parser().setSigningKey(SECRET.getBytes()).parseClaimsJws(jwtToken).getBody();
+		String jwtToken = request.getHeader(Constants.getHeader()).replace(Constants.getPrefix(), "");
+		return Jwts.parser().setSigningKey(Constants.getSecretKey().getBytes()).parseClaimsJws(jwtToken).getBody();
 	}
 	
 	/**
@@ -71,10 +72,12 @@ public class JWTAuthorizationFilter extends OncePerRequestFilter {
 	}
 	
 	private boolean checkJWTToken(HttpServletRequest request, HttpServletResponse res) {
-		String authenticationHeader = request.getHeader(HEADER);
-		if(authenticationHeader == null || !authenticationHeader.startsWith(PREFIX)) {
+		String authenticationHeader = request.getHeader(Constants.getHeader());
+		
+		if(authenticationHeader == null || !authenticationHeader.startsWith(Constants.getPrefix())) {
 			return false;
 		}
+		
 		return true;
 	}
 	

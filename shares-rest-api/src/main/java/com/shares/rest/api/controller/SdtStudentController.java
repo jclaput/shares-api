@@ -3,6 +3,7 @@ package com.shares.rest.api.controller;
 import java.time.Instant;
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -14,6 +15,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.shares.rest.api.AuthHeader;
 import com.shares.rest.api.data.BatchUpdateResult;
 import com.shares.rest.api.data.GuidanceReportResult;
 import com.shares.rest.api.data.GuidanceReportStatistics;
@@ -22,9 +24,12 @@ import com.shares.rest.api.generics.types.DataReturnDual;
 import com.shares.rest.api.service.SdtStudentService;
 import com.shares.rest.common.enums.StudentRegistrationStatus;
 
-@CrossOrigin(origins = "http://localhost:3000")
+@CrossOrigin(origins = "*")
 @RestController
 public class SdtStudentController {
+	
+	@Autowired
+	private HttpServletRequest request;
 	
 	Logger logger = LoggerFactory.getLogger(SdtStudentController.class);
 	
@@ -38,7 +43,7 @@ public class SdtStudentController {
 	}
 	
 	@GetMapping("/studentByLRN/{lrnNo}")
-	public SdtStudent findByLRN(@PathVariable String lrnNo) {
+	public SdtStudent findByLRN(@PathVariable String lrnNo) {	
 		return sdtStudentService.getSudentByLrnNo(lrnNo);
 	}
 	
@@ -54,26 +59,42 @@ public class SdtStudentController {
 	
 	@GetMapping("/sdtStudentsGetAll")
 	public List<SdtStudent> getAllSdtStudents() {
+		
+		AuthHeader authHeader = new AuthHeader(request);
+		if (authHeader.isAnonymous()) return null;
+		
 		return sdtStudentService.getAllSdtStudents();
 	}
 	
 	@GetMapping("/sdtStudentsGetAllCurrentlyEnrolled")
 	public List<SdtStudent> getAllCurrentlyEnrolledStudents() {
+		
+		AuthHeader authHeader = new AuthHeader(request);
+		if (authHeader.isAnonymous()) return null;
+		
 		return sdtStudentService.getAllCurrentlyEnrolledStudents();
 	}
 	
 	@GetMapping("/sdtStudentsGetSection/{sectionId}")
 	public List<SdtStudent> getAllCurrentlyEnrolledStudentsSection(@PathVariable Integer sectionId) {
+		
+		AuthHeader authHeader = new AuthHeader(request);
+		if (authHeader.isAnonymous()) return null;
+		
 		return sdtStudentService.getAllCurrentlyEnrolledStudentsSection(sectionId);
 	}
 	
 	@GetMapping("/sdtStudentGetById/{id}")
-	public SdtStudent getSdtStudentById(@PathVariable String id) {		
+	public SdtStudent getSdtStudentById(@PathVariable String id) {
 		return sdtStudentService.getSdtStudentById(id);
 	}
 	
 	@GetMapping("/sdtGuidanceEarlyRegistrationReport")
 	public DataReturnDual<List<GuidanceReportResult>, List<GuidanceReportStatistics>> getGuidanceEarlyRegistrationReport() {
+		
+		AuthHeader authHeader = new AuthHeader(request);
+		if (authHeader.isAnonymous()) return null;
+		
 		return sdtStudentService.getGuidanceEarlyRegistrationReport();
 	}
 	
@@ -150,19 +171,19 @@ public class SdtStudentController {
 		
 		student.setShsTrackSecondChoice(
 				student.getShsSchoolSecondChoice() == null || 
-				student.getShsSchoolSecondChoice().getCode().isBlank() 
+				"".equalsIgnoreCase(student.getShsSchoolSecondChoice().getCode()) 
 				? null 
 				: student.getShsTrackSecondChoice()
 		);
 		student.setShsStrSpecSecondChoice(
 				student.getShsSchoolSecondChoice() == null || 
-				student.getShsSchoolSecondChoice().getCode().isBlank()
+				"".equalsIgnoreCase(student.getShsSchoolSecondChoice().getCode())
 				? null 
 				: student.getShsStrSpecSecondChoice()
 		);
 		student.setShsSchoolSecondChoice(
 				student.getShsSchoolSecondChoice() == null ||
-				student.getShsSchoolSecondChoice().getCode().isBlank()
+				"".equalsIgnoreCase(student.getShsSchoolSecondChoice().getCode())
 				? null
 				: student.getShsSchoolSecondChoice()
 		);
@@ -269,12 +290,20 @@ public class SdtStudentController {
 	}
 	
 	@PutMapping("/assignStudentToSection")
-	public SdtStudent assignStudentToSection(@RequestBody SdtStudent sdtStudent) {				
+	public SdtStudent assignStudentToSection(@RequestBody SdtStudent sdtStudent) {
+		
+		AuthHeader authHeader = new AuthHeader(request);
+		if (authHeader.isAnonymous()) return null;
+		
 		return sdtStudentService.assignStudentToSection(sdtStudent);
 	}
 	
 	@PutMapping("/batchAssignStudentsToSection")
 	public BatchUpdateResult batchAssignStudentsToSection(@RequestBody List<SdtStudent> sdtStudents) {
+		
+		AuthHeader authHeader = new AuthHeader(request);
+		if (authHeader.isAnonymous()) return null;
+		
 		return sdtStudentService.batchAssignStudentsToSection(sdtStudents);
 	}
 }
